@@ -27,3 +27,23 @@ output "internet_gateway_id" {
   description = "ID of the internet gateway"
   value       = aws_internet_gateway.igw.id
 }
+
+output "bastion_instance_id" {
+  description = "ID of the bastion EC2 instance"
+  value       = aws_instance.bastion.id
+}
+
+output "bastion_public_ip" {
+  description = "Public IPv4 address of the bastion host"
+  value       = aws_instance.bastion.public_ip
+}
+
+output "bastion_public_dns" {
+  description = "Public DNS name of the bastion host"
+  value       = aws_instance.bastion.public_dns
+}
+
+output "bastion_ssh_command" {
+  description = "SSH command to connect to the bastion host"
+  value       = "ssh -i ${pathexpand(var.ec2_private_key_path)} ec2-user@${aws_instance.bastion.public_ip}"
+}
