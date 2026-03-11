@@ -59,3 +59,52 @@ resource "aws_instance" "bastion" {
     Name = "${var.project_name}-bastion"
   })
 }
+resource "aws_security_group" "app" {
+  name        = "${var.project_name}-app-sg"
+  description = "Allow SSH only from bastion security group"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description     = "SSH from bastion host only"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion.id]
+  }
+
+  egress {
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-app-sg"
+  })
+}
+
+resource "aws_instance" "app" {
+  ami                         = data.aws_ssm_parameter.al2023_ami.value
+  instance_type               = var.app_instance_type
+  subnet_id                   = aws_subnet.private.id
+  vpc_security_group_ids      = [aws_security_group.app.id]
+  key_name                    = aws_key_pair.bastion.key_name
+  associate_public_ip_address = false
+
+  metadata_options {
+    http_tokens = "required"
+  }
+
+  root_block_device {
+    volume_size = 8
+    volume_type = "gp3"
+    encrypted   = true
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-app"
+  })
+}
+

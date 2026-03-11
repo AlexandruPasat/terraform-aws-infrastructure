@@ -50,3 +50,9 @@ variable "bastion_instance_type" {
   type        = string
   default     = "t3.micro"
 }
+
+variable "app_instance_type" {
+  description = "EC2 instance type for the private app server"
+  type        = string
+  default     = "t3.micro"
+}

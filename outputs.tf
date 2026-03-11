@@ -47,3 +47,17 @@ output "bastion_ssh_command" {
   description = "SSH command to connect to the bastion host"
   value       = "ssh -i ${pathexpand(var.ec2_private_key_path)} ec2-user@${aws_instance.bastion.public_ip}"
 }
+output "app_instance_id" {
+  description = "ID of the private app EC2 instance"
+  value       = aws_instance.app.id
+}
+
+output "app_private_ip" {
+  description = "Private IPv4 address of the app server"
+  value       = aws_instance.app.private_ip
+}
+
+output "ssh_app_via_bastion" {
+  description = "SSH command to reach the app server through the bastion host"
+  value       = "ssh -i ${pathexpand(var.ec2_private_key_path)} -J ec2-user@${aws_instance.bastion.public_ip} ec2-user@${aws_instance.app.private_ip}"
+}
