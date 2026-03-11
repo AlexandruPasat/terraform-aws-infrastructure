@@ -59,6 +59,7 @@ resource "aws_instance" "bastion" {
     Name = "${var.project_name}-bastion"
   })
 }
+
 resource "aws_security_group" "app" {
   name        = "${var.project_name}-app-sg"
   description = "Allow SSH only from bastion security group"
@@ -68,6 +69,14 @@ resource "aws_security_group" "app" {
     description     = "SSH from bastion host only"
     from_port       = 22
     to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion.id]
+  }
+
+  ingress {
+    description     = "HTTP test traffic from bastion only"
+    from_port       = 8080
+    to_port         = 8080
     protocol        = "tcp"
     security_groups = [aws_security_group.bastion.id]
   }
@@ -107,4 +116,3 @@ resource "aws_instance" "app" {
     Name = "${var.project_name}-app"
   })
 }
-
